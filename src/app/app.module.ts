@@ -4,11 +4,13 @@ import { NgModule } from '@angular/core';
 
 
 import { AppComponent } from './app.component';
+import { SelectableTableComponent } from './selectable-table/selectable-table.component';
 
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    SelectableTableComponent
   ],
   imports: [
     BrowserModule,
