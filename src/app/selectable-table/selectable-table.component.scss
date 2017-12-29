@@ -1,0 +1,10 @@
+// 基本的なテーブル表示用displayプロパティ
+cdk-table {
+  display: table;
+  cdk-header-row, cdk-row {
+    display: table-row;
+    cdk-header-cell, cdk-cell {
+      display: table-cell;
+    }
+  }
+}

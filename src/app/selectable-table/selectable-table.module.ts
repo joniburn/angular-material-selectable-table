@@ -1,4 +1,6 @@
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { CdkTableModule } from '@angular/cdk/table';
 
 import { SelectableTableComponent } from './selectable-table.component';
 
@@ -10,6 +12,8 @@ import { SelectableTableComponent } from './selectable-table.component';
     SelectableTableComponent,
   ],
   imports: [
+    CommonModule,
+    CdkTableModule,
   ],
 })
 export class SelectableTableModule { }

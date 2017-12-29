@@ -1,3 +1,11 @@
-<p>
-  selectable-table works!
-</p>
+<cdk-table [dataSource]="dataSource" *ngIf="headerKeys">
+
+  <ng-container *ngFor="let key of headerKeys" cdkColumnDef="{{key}}">
+    <cdk-header-cell *cdkHeaderCellDef>{{headers[key]}}</cdk-header-cell>
+    <cdk-cell *cdkCellDef="let row">{{row.data[key]}}</cdk-cell>
+  </ng-container>
+
+  <cdk-header-row *cdkHeaderRowDef="headerKeys"></cdk-header-row>
+  <cdk-row *cdkRowDef="let row; columns: headerKeys;"></cdk-row>
+
+</cdk-table>
