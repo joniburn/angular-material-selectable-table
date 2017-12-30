@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 
 
 import { AppComponent } from './app.component';
-import { SelectableTableModule } from './selectable-table/selectable-table.module';
+import { SelectableTableModule } from './selectable-table';
 
 
 @NgModule({
