@@ -5,6 +5,7 @@ import { SimpleChange } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { CdkTableModule } from '@angular/cdk/table';
+import { MatPaginatorModule } from '@angular/material';
 
 import { SelectableTableComponent } from './selectable-table.component';
 import { SelectableTableDataProvider } from './data-provider';
@@ -18,8 +19,9 @@ describe('SelectableTableComponent', () => {
       declarations: [
         SelectableTableComponent,
       ],
-      imports :[
+      imports: [
         CdkTableModule,
+        MatPaginatorModule,
       ],
     })
     .compileComponents();
@@ -32,7 +34,9 @@ describe('SelectableTableComponent', () => {
   });
 
   it('コンポーネントを初期化できること', () => {
-    expect(component).toBeTruthy();
+    expect(component).toBeTruthy('コンポーネントを初期化できること');
+    const matPaginator = fixture.debugElement.query(By.css('mat-paginator'));
+    expect(matPaginator).toBeTruthy('mat-paginatorがレンダリングされること');
   });
 
   it('データを表示できること', () => {
