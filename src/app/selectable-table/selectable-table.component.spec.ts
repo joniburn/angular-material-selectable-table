@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
 import { SimpleChange } from '@angular/core';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { CdkTableModule } from '@angular/cdk/table';
@@ -20,6 +21,7 @@ describe('SelectableTableComponent', () => {
         SelectableTableComponent,
       ],
       imports: [
+        NoopAnimationsModule,
         CdkTableModule,
         MatPaginatorModule,
       ],
