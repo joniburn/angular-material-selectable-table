@@ -8,3 +8,10 @@ cdk-table {
     }
   }
 }
+
+:host {
+  display: block;
+  mat-paginator {
+    margin-bottom: -10px;
+  }
+}

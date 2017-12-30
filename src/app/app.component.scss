@@ -1,0 +1,22 @@
+@import '../theme.scss';
+
+.table-sample {
+  width: 600px;
+  padding: 20px;
+}
+
+@mixin themed($theme) {
+  mat-paginator {
+    @include angular-material-theme($theme);
+  }
+  background-color: mat-color(map-get($theme, background), background);
+  color: mat-color(map-get($theme, foreground), base);
+}
+
+.light-theme {
+  @include themed($light-theme);
+}
+
+.dark-theme {
+  @include themed($dark-theme);
+}
