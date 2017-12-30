@@ -1,4 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { PageEvent } from '@angular/material/paginator';
 
 import { SelectableTableDataProvider } from './data-provider';
 import { TableDataSource } from './data-source';
@@ -33,6 +34,9 @@ export class SelectableTableComponent implements OnChanges {
   @Input()
   headers: { [key: string]: string };
 
+  pageSize = 20;
+  pageIndex = 0;
+
   dataSource: TableDataSource;
   headerKeys: string[];
 
@@ -43,10 +47,18 @@ export class SelectableTableComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['dataProvider']) {
       this.dataSource = new TableDataSource(this.dataProvider);
-      this.dataSource.setPage(0, 20);  // TODO ページング処理
+      this.dataSource.setPage(this.pageIndex, this.pageSize);
     }
     if (changes['headers']) {
       this.headerKeys = Object.keys(this.headers);
+    }
+  }
+
+  onPageEvent(pageEvent: PageEvent) {
+    if (this.dataSource) {
+      this.pageIndex = pageEvent.pageIndex;
+      this.pageSize = pageEvent.pageSize;
+      this.dataSource.setPage(this.pageIndex, this.pageSize);
     }
   }
 

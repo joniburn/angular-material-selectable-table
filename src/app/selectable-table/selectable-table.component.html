@@ -10,5 +10,9 @@
 
 </cdk-table>
 
-<mat-paginator>
+<mat-paginator
+  [length]="length"
+  [pageIndex]="pageIndex"
+  [pageSize]="pageSize"
+  (page)="onPageEvent($event)">
 </mat-paginator>

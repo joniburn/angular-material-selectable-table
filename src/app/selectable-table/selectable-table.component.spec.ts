@@ -39,6 +39,34 @@ describe('SelectableTableComponent', () => {
     expect(matPaginator).toBeTruthy('mat-paginatorがレンダリングされること');
   });
 
+  function testTableContent(nrows: number, ncols: number, startRow: number = 1) {
+    // ヘッダー部分の確認
+    const headerRowList = fixture.debugElement.queryAll(By.css('cdk-header-row'));
+    expect(headerRowList.length).toBe(1, 'cdk-header-rowが1個あること');
+    const headerRow1 = headerRowList[0];
+    const headerCellList = headerRow1.queryAll(By.css('cdk-header-cell'));
+    expect(headerCellList.length).toBe(ncols, 'cdk-header-cellがカラム数分あること');
+    headerCellList.forEach((headerCell, colNumber) => {
+      const elm = headerCell.nativeElement as Element;
+      const headerText = elm.textContent;
+      expect(headerText).toBe(`d0${colNumber + 1}`, 'ヘッダーのテキストが正しいこと');
+    });
+
+    // テーブル本体部分の確認
+    const rowList = fixture.debugElement.queryAll(By.css('cdk-row'));
+    expect(rowList.length).toBe(nrows, 'cdk-rowが行数分あること');
+    rowList.forEach((row, rowNumber) => {
+      const cellList = row.queryAll(By.css('cdk-cell'));
+      expect(cellList.length).toBe(ncols, 'cdk-cellがカラム数分あること');
+      cellList.forEach((cell, colNumber) => {
+        const elm = cell.nativeElement as Element;
+        const cellText = elm.textContent;
+        const expected = `${pad(rowNumber + startRow)}-${pad(colNumber + 1)}`;
+        expect(cellText).toBe(expected, 'セルの内容が正しいこと');
+      });
+    });
+  }
+
   it('データを表示できること', () => {
     const dataProvider = new TestDataProvider(20, 5);
     component.dataProvider = dataProvider;
@@ -51,31 +79,36 @@ describe('SelectableTableComponent', () => {
     });
     fixture.detectChanges();
 
-    // ヘッダー部分の確認
-    const headerRowList = fixture.debugElement.queryAll(By.css('cdk-header-row'));
-    expect(headerRowList.length).toBe(1, 'cdk-header-rowが1個あること');
-    const headerRow1 = headerRowList[0];
-    const headerCellList = headerRow1.queryAll(By.css('cdk-header-cell'));
-    expect(headerCellList.length).toBe(5, 'その中にcdk-header-cellが5個あること');
-    for (let i = 0; i < 5; i++) {
-      const elm = headerCellList[i].nativeElement as Element;
-      const headerText = elm.textContent;
-      expect(headerText).toBe(`d0${i + 1}`, 'ヘッダーのテキストが d01 ～ d05 であること');
-    }
+    testTableContent(20, 5);
+  });
 
-    // テーブル本体部分の確認
-    const rowList = fixture.debugElement.queryAll(By.css('cdk-row'));
-    expect(rowList.length).toBe(20, 'cdk-rowが20個あること');
-    rowList.forEach((row, rowNumber) => {
-      const cellList = row.queryAll(By.css('cdk-cell'));
-      expect(cellList.length).toBe(5, 'それぞれの中にcdk-cellが5個あること');
-      for (let i = 0; i < 5; i++) {
-        const elm = cellList[i].nativeElement as Element;
-        const cellText = elm.textContent;
-        const expected = `${pad(rowNumber + 1)}-${pad(i + 1)}`;
-        expect(cellText).toBe(expected, 'セルの内容が正しいこと');
-      }
+  it('ページング表示できること', () => {
+    const dataProvider = new TestDataProvider(27, 5);
+    component.dataProvider = dataProvider;
+    component.length = 27;
+    component.pageSize = 10;
+    component.headers = dataProvider.headerDef;
+    component.ngOnChanges({
+      'dataProvider': new SimpleChange(null, null, true),
+      'headers': new SimpleChange(null, null, true),
+      'length': new SimpleChange(null, null, true),
     });
+    fixture.detectChanges();
+
+    testTableContent(10, 5);
+
+    // 2ページ目を表示する
+    const nextButton = fixture.debugElement.query(By.css('.mat-paginator-navigation-next'));
+    nextButton.triggerEventHandler('click', {button: 0});
+    fixture.detectChanges();
+
+    testTableContent(10, 5, 11);
+
+    // 3ページ目を表示する
+    nextButton.triggerEventHandler('click', {button: 0});
+    fixture.detectChanges();
+
+    testTableContent(7, 5, 21);
   });
 
 });
@@ -108,16 +141,18 @@ class TestDataProvider implements SelectableTableDataProvider {
 
   getRecords(pageIndex: number, pageSize: number): Observable<{ [key: string]: string }[]> {
     const records: { [key: string]: string }[] = [];
+    const startRow = 1 + (pageIndex * pageSize);
+    const endRow = Math.min(startRow + pageSize, this.nrows + 1);
 
     // 行データを作成
-    for (let row = 1; row <= this.nrows; row++) {
+    for (let row = startRow; row < endRow; row++) {
       const data: { [key: string]: string } = {};
       for (let col = 1; col <= this.ncols; col++) {
         data[`c${pad(col)}`] = `${pad(row)}-${pad(col)}`;
       }
       records.push(data);
     }
-    return new BehaviorSubject<{ [key: string]: string }[]>(records);  // TODO ページング処理
+    return new BehaviorSubject<{ [key: string]: string }[]>(records);
   }
 
 }
