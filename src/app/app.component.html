@@ -1,16 +1,50 @@
-<div class="light-theme table-sample">
-  <mst-selectable-table
-    [dataProvider]="dataProvider"
-    [length]="100"
-    [pageSize]="10"
-    [headers]="dataProvider.headerDef">
-  </mst-selectable-table>
-</div>
-<div class="dark-theme table-sample">
-  <mst-selectable-table
-    [dataProvider]="dataProvider"
-    [length]="100"
-    [pageSize]="10"
-    [headers]="dataProvider.headerDef">
-  </mst-selectable-table>
+<div class="columns">
+  <div class="row">
+    <div>light themed light table</div>
+    <div class="light-theme light-table table-sample">
+      <mat-card>
+        <mst-selectable-table
+          [dataProvider]="dataProvider"
+          [length]="100"
+          [pageSize]="10"
+          [headers]="dataProvider.headerDef">
+        </mst-selectable-table>
+      </mat-card>
+    </div>
+    <div>dark themed dark table</div>
+    <div class="dark-theme dark-table table-sample">
+      <mat-card>
+        <mst-selectable-table
+          [dataProvider]="dataProvider"
+          [length]="100"
+          [pageSize]="10"
+          [headers]="dataProvider.headerDef">
+        </mst-selectable-table>
+      </mat-card>
+    </div>
+  </div>
+  <div class="row">
+    <div>light themed dark table</div>
+    <div class="light-theme dark-table table-sample">
+      <mat-card>
+        <mst-selectable-table
+          [dataProvider]="dataProvider"
+          [length]="100"
+          [pageSize]="10"
+          [headers]="dataProvider.headerDef">
+        </mst-selectable-table>
+      </mat-card>
+    </div>
+    <div>dark themed light table</div>
+    <div class="dark-theme light-table table-sample">
+      <mat-card>
+        <mst-selectable-table
+          [dataProvider]="dataProvider"
+          [length]="100"
+          [pageSize]="10"
+          [headers]="dataProvider.headerDef">
+        </mst-selectable-table>
+      </mat-card>
+    </div>
+  </div>
 </div>

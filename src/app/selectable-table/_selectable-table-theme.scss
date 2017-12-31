@@ -1,0 +1,29 @@
+@import '~@angular/material/theming';
+
+@mixin _common($theme, $table-theme) {
+  $divider: mat-color(map-get($table-theme, foreground), divider);
+
+  .mst-table-container {
+    border: 1px solid $divider;
+    background-color: mat-color(map-get($table-theme, background), background);
+    color: mat-color(map-get($table-theme, foreground), base);
+  }
+}
+
+@mixin selectable-table-theme-light($theme) {
+  $table-theme: mat-light-theme(
+    map-get($theme, primary),
+    map-get($theme, accent),
+    map-get($theme, warn)
+  );
+  @include _common($theme, $table-theme);
+}
+
+@mixin selectable-table-theme-dark($theme) {
+  $table-theme: mat-dark-theme(
+    map-get($theme, primary),
+    map-get($theme, accent),
+    map-get($theme, warn)
+  );
+  @include _common($theme, $table-theme);
+}
