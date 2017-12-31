@@ -34,7 +34,15 @@ export class SelectableTableComponent implements OnChanges {
   @Input()
   headers: { [key: string]: string };
 
+  /**
+   * 1ページ当たりの表示件数の初期値。
+   */
+  @Input()
   pageSize = 20;
+
+  /**
+   * ページ番号。0オリジン。
+   */
   pageIndex = 0;
 
   dataSource: TableDataSource;
