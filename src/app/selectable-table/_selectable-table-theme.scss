@@ -1,12 +1,29 @@
 @import '~@angular/material/theming';
 
 @mixin _common($theme, $table-theme) {
-  $divider: mat-color(map-get($table-theme, foreground), divider);
+  $divider: mat-color(map-get($theme, foreground), divider);
+  $border: mat-color(map-get($table-theme, foreground), divider);
 
   .mst-table-container {
     border: 1px solid $divider;
-    background-color: mat-color(map-get($table-theme, background), background);
+    background-color: mat-color(map-get($theme, background), hover);
     color: mat-color(map-get($table-theme, foreground), base);
+  }
+
+  // 罫線
+  cdk-cell {
+    border-top: 1px solid $border;
+  }
+  cdk-header-cell, cdk-cell {
+    border-right: 1px solid $border;
+  }
+
+  // 背景色
+  cdk-header-cell {
+    background-color: mat-color(map-get($table-theme, background), app-bar);
+  }
+  cdk-cell {
+    background-color: mat-color(map-get($table-theme, background), background);
   }
 }
 

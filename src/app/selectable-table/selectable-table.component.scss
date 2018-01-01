@@ -17,3 +17,15 @@ cdk-table {
 mat-paginator {
   margin-bottom: -10px;
 }
+
+cdk-header-cell, cdk-cell {
+  padding: 2px 5px;
+}
+
+cdk-header-cell {
+  text-align: center;
+}
+
+cdk-cell {
+  text-align: right;
+}
