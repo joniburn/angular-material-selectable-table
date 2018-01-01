@@ -18,8 +18,14 @@ mat-paginator {
   margin-bottom: -10px;
 }
 
+.mst-table-container {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 cdk-header-cell, cdk-cell {
   padding: 2px 5px;
+  white-space: nowrap;
 }
 
 cdk-header-cell {

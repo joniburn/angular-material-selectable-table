@@ -18,18 +18,19 @@ class SampleDataProvider implements SelectableTableDataProvider {
 
   /*
    * 以下のようなテーブルを表示する。
-   * |    c1 |    c2 | ←キー名
-   * | Col 1 | Col 2 | ←表示名
-   * |-------|-------|
-   * |     1 |  text |
-   * |     2 |  text |
+   * |    c1 |    c2 |                      c3 | ←キー名
+   * | Col 1 | Col 2 |                   Col 3 | ←表示名
+   * |-------|-------|-------------------------|
+   * |     1 |  text |               long text |
+   * |     2 |  text | long long long ... text |
    *   ...
-   * |   100 |  text |
+   * |   100 |  text |               long text |
    */
 
   headerDef: { [key: string]: string } = {
     'c1': 'Col 1',
     'c2': 'Col 2',
+    'c3': 'Col 3',
   };
 
   getRecords(pageIndex: number, pageSize: number): Observable<{ [key: string]: string }[]> {
@@ -38,9 +39,16 @@ class SampleDataProvider implements SelectableTableDataProvider {
     const data: { [key: string]: string }[] = [];
 
     for (let row = startRow; row < endRow; row++) {
+      let c3Text = 'long text';
+      if (row === 2) {
+        for (let i = 0; i < 20; i++) {
+          c3Text = 'long ' + c3Text;
+        }
+      }
       data.push({
         'c1': `${row}`,
         'c2': 'text',
+        'c3': c3Text,
       });
     }
     return new BehaviorSubject(data);
