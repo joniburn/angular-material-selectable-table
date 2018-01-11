@@ -1,50 +1,29 @@
-<div class="columns">
-  <div class="row">
-    <div>light themed light table</div>
-    <div class="light-theme light-table table-sample">
-      <mat-card>
-        <mst-selectable-table
-          [dataProvider]="dataProvider"
-          [length]="100"
-          [pageSize]="10"
-          [headers]="dataProvider.headerDef">
-        </mst-selectable-table>
-      </mat-card>
+<mat-sidenav-container>
+  <div class="theme-selectors">
+    <div>
+      <mat-slide-toggle [color]="'primary'" [(ngModel)]="themeManagerService.isDark">
+        Your application theme is dark
+      </mat-slide-toggle>
     </div>
-    <div>dark themed dark table</div>
-    <div class="dark-theme dark-table table-sample">
-      <mat-card>
-        <mst-selectable-table
-          [dataProvider]="dataProvider"
-          [length]="100"
-          [pageSize]="10"
-          [headers]="dataProvider.headerDef">
-        </mst-selectable-table>
-      </mat-card>
+    <div>
+      <mat-slide-toggle [color]="'primary'" [(ngModel)]="tableThemeIsDark">
+        Table theme is dark
+      </mat-slide-toggle>
     </div>
   </div>
-  <div class="row">
-    <div>light themed dark table</div>
-    <div class="light-theme dark-table table-sample">
-      <mat-card>
-        <mst-selectable-table
-          [dataProvider]="dataProvider"
-          [length]="100"
-          [pageSize]="10"
-          [headers]="dataProvider.headerDef">
-        </mst-selectable-table>
-      </mat-card>
-    </div>
-    <div>dark themed light table</div>
-    <div class="dark-theme light-table table-sample">
-      <mat-card>
-        <mst-selectable-table
-          [dataProvider]="dataProvider"
-          [length]="100"
-          [pageSize]="10"
-          [headers]="dataProvider.headerDef">
-        </mst-selectable-table>
-      </mat-card>
-    </div>
+
+  <div class="table-sample"
+      [class.light-theme]="!themeManagerService.isDark"
+      [class.dark-theme]="themeManagerService.isDark"
+      [class.light-table]="!tableThemeIsDark"
+      [class.dark-table]="tableThemeIsDark">
+    <mat-card>
+      <mst-selectable-table
+        [dataProvider]="dataProvider"
+        [length]="100"
+        [pageSize]="10"
+        [headers]="dataProvider.headerDef">
+      </mst-selectable-table>
+    </mat-card>
   </div>
-</div>
+</mat-sidenav-container>

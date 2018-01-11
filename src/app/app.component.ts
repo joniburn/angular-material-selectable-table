@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { SelectableTableDataProvider } from './selectable-table';
+import { ThemeManagerService } from './theme-manager.service';
 
 @Component({
   selector: 'mst-root',
@@ -12,6 +13,12 @@ import { SelectableTableDataProvider } from './selectable-table';
 })
 export class AppComponent {
   dataProvider = new SampleDataProvider();
+  tableThemeIsDark = false;
+
+  constructor(
+    public themeManagerService: ThemeManagerService,
+  ) {
+  }
 }
 
 class SampleDataProvider implements SelectableTableDataProvider {

@@ -1,10 +1,6 @@
 @import '../theme.scss';
 @import './selectable-table/_selectable-table-theme.scss';
 
-@mixin themed-base($theme) {
-  @include angular-material-theme($theme);
-}
-
 @mixin themed-table-light($theme) {
   mst-selectable-table {
     @include selectable-table-theme-light($theme);
@@ -17,47 +13,31 @@
   }
 }
 
+.theme-selectors {
+  margin: 20px;
+}
+
 .table-sample {
   width: 600px;
-}
-
-.columns {
-  display: flex;
-  flex-direction: row;
-}
-
-.row {
-  display: flex;
-  flex-direction: column;
-  &:not(:first-child) {
-    margin-left: 20px;
+  mat-card {
+    padding: 8px;
   }
-}
 
-.light-theme {
-  @include themed-base($light-theme);
-}
+  &.light-theme {
+    &.light-table {
+      @include themed-table-light($light-theme);
+    }
+    &.dark-table {
+      @include themed-table-dark($light-theme);
+    }
+  }
 
-.dark-theme {
-  @include themed-base($dark-theme);
-}
-
-.light-theme.light-table {
-  @include themed-table-light($light-theme);
-}
-
-.light-theme.dark-table {
-  @include themed-table-dark($light-theme);
-}
-
-.dark-theme.light-table {
-  @include themed-table-light($dark-theme);
-}
-
-.dark-theme.dark-table {
-  @include themed-table-dark($dark-theme);
-}
-
-mst-selectable-table {
-  margin: -18px!important;
+  &.dark-theme {
+    &.light-table {
+      @include themed-table-light($dark-theme);
+    }
+    &.dark-table {
+      @include themed-table-dark($dark-theme);
+    }
+  }
 }

@@ -1,1 +1,19 @@
 /* You can add global styles to this file, and also import other style files */
+@import 'theme.scss';
+
+body.light-theme {
+  @include angular-material-theme($light-theme);
+}
+body.dark-theme {
+  @include angular-material-theme($dark-theme);
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+mat-sidenav-container {
+  height: 100%;
+  padding: 8px;
+}
