@@ -12,6 +12,7 @@
     </div>
   </div>
 
+  <div>チェックボックスなし</div>
   <div class="table-sample"
       [class.light-theme]="!themeManagerService.isDark"
       [class.dark-theme]="themeManagerService.isDark"
@@ -19,6 +20,23 @@
       [class.dark-table]="tableThemeIsDark">
     <mat-card>
       <mst-selectable-table
+        [dataProvider]="dataProvider"
+        [length]="100"
+        [pageSize]="10"
+        [headers]="dataProvider.headerDef">
+      </mst-selectable-table>
+    </mat-card>
+  </div>
+
+  <div>チェックボックスあり</div>
+  <div class="table-sample"
+      [class.light-theme]="!themeManagerService.isDark"
+      [class.dark-theme]="themeManagerService.isDark"
+      [class.light-table]="!tableThemeIsDark"
+      [class.dark-table]="tableThemeIsDark">
+    <mat-card>
+      <mst-selectable-table
+        [selectable]="true"
         [dataProvider]="dataProvider"
         [length]="100"
         [pageSize]="10"

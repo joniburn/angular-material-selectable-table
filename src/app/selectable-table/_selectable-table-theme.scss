@@ -25,6 +25,11 @@
   cdk-cell {
     background-color: mat-color(map-get($table-theme, background), background);
   }
+
+  // チェックボックス
+  mat-checkbox {
+    @include mat-checkbox-theme($table-theme);
+  }
 }
 
 @mixin selectable-table-theme-light($theme) {
