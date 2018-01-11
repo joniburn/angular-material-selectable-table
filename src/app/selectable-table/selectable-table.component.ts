@@ -20,6 +20,12 @@ export class SelectableTableComponent implements OnChanges {
   dataProvider: SelectableTableDataProvider;
 
   /**
+   * trueを指定すると、行を選択するためのチェックボックスを表示する。
+   */
+  @Input()
+  selectable = false;
+
+  /**
    * データの総件数。
    */
   @Input()
@@ -47,6 +53,7 @@ export class SelectableTableComponent implements OnChanges {
 
   dataSource: TableDataSource;
   headerKeys: string[];
+  headerKeysAndCheckbox: string[];
 
   constructor(
   ) {
@@ -59,6 +66,10 @@ export class SelectableTableComponent implements OnChanges {
     }
     if (changes['headers']) {
       this.headerKeys = Object.keys(this.headers);
+      this.headerKeysAndCheckbox = Array.from(this.headerKeys);
+      if (this.selectable) {
+        this.headerKeysAndCheckbox.splice(0, 0, '_checkbox');
+      }
     }
   }
 

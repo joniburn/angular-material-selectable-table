@@ -6,7 +6,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { CdkTableModule } from '@angular/cdk/table';
-import { MatPaginatorModule } from '@angular/material';
+import { MatCheckboxModule, MatPaginatorModule } from '@angular/material';
 
 import { SelectableTableComponent } from './selectable-table.component';
 import { SelectableTableDataProvider } from './data-provider';
@@ -23,6 +23,7 @@ describe('SelectableTableComponent', () => {
       imports: [
         NoopAnimationsModule,
         CdkTableModule,
+        MatCheckboxModule,
         MatPaginatorModule,
       ],
     })
@@ -41,31 +42,60 @@ describe('SelectableTableComponent', () => {
     expect(matPaginator).toBeTruthy('mat-paginatorがレンダリングされること');
   });
 
-  function testTableContent(nrows: number, ncols: number, startRow: number = 1) {
+  function testTableContent(nrows: number, ncols: number, startRow: number = 1, hasCheckbox = false) {
     // ヘッダー部分の確認
     const headerRowList = fixture.debugElement.queryAll(By.css('cdk-header-row'));
     expect(headerRowList.length).toBe(1, 'cdk-header-rowが1個あること');
     const headerRow1 = headerRowList[0];
     const headerCellList = headerRow1.queryAll(By.css('cdk-header-cell'));
-    expect(headerCellList.length).toBe(ncols, 'cdk-header-cellがカラム数分あること');
-    headerCellList.forEach((headerCell, colNumber) => {
-      const elm = headerCell.nativeElement as Element;
-      const headerText = elm.textContent;
-      expect(headerText).toBe(`d0${colNumber + 1}`, 'ヘッダーのテキストが正しいこと');
-    });
+    if (hasCheckbox) {
+      expect(headerCellList.length).toBe(ncols + 1, 'cdk-header-cellがカラム数 + 1個あること');
+      headerCellList.forEach((headerCell, colNumber) => {
+        if (colNumber === 0) {
+          const checkbox = headerCell.query(By.css('mat-checkbox'));
+          expect(checkbox).toBeTruthy('ヘッダー1列目にチェックボックスを含むこと');
+        } else {
+          const elm = headerCell.nativeElement as Element;
+          const headerText = elm.textContent;
+          expect(headerText).toBe(`d0${colNumber}`, 'ヘッダーのテキストが正しいこと');
+        }
+      });
+    } else {
+      expect(headerCellList.length).toBe(ncols, 'cdk-header-cellがカラム数分あること');
+      headerCellList.forEach((headerCell, colNumber) => {
+        const elm = headerCell.nativeElement as Element;
+        const headerText = elm.textContent;
+        expect(headerText).toBe(`d0${colNumber + 1}`, 'ヘッダーのテキストが正しいこと');
+      });
+    }
 
     // テーブル本体部分の確認
     const rowList = fixture.debugElement.queryAll(By.css('cdk-row'));
     expect(rowList.length).toBe(nrows, 'cdk-rowが行数分あること');
     rowList.forEach((row, rowNumber) => {
       const cellList = row.queryAll(By.css('cdk-cell'));
-      expect(cellList.length).toBe(ncols, 'cdk-cellがカラム数分あること');
-      cellList.forEach((cell, colNumber) => {
-        const elm = cell.nativeElement as Element;
-        const cellText = elm.textContent;
-        const expected = `${pad(rowNumber + startRow)}-${pad(colNumber + 1)}`;
-        expect(cellText).toBe(expected, 'セルの内容が正しいこと');
-      });
+      if (hasCheckbox) {
+        expect(cellList.length).toBe(ncols + 1, 'cdk-cellがカラム数 + 1個あること');
+        cellList.forEach((cell, colNumber) => {
+          if (colNumber === 0) {
+            const checkbox = cell.query(By.css('mat-checkbox'));
+            expect(checkbox).toBeTruthy('1列目にチェックボックスを含むこと');
+          } else {
+            const elm = cell.nativeElement as Element;
+            const cellText = elm.textContent;
+            const expected = `${pad(rowNumber + startRow)}-${pad(colNumber)}`;
+            expect(cellText).toBe(expected, 'セルの内容が正しいこと');
+          }
+        });
+      } else {
+        expect(cellList.length).toBe(ncols, 'cdk-cellがカラム数分あること');
+        cellList.forEach((cell, colNumber) => {
+          const elm = cell.nativeElement as Element;
+          const cellText = elm.textContent;
+          const expected = `${pad(rowNumber + startRow)}-${pad(colNumber + 1)}`;
+          expect(cellText).toBe(expected, 'セルの内容が正しいこと');
+        });
+      }
     });
   }
 
@@ -111,6 +141,22 @@ describe('SelectableTableComponent', () => {
     fixture.detectChanges();
 
     testTableContent(7, 5, 21);
+  });
+
+  it('チェックボックスを表示できること', () => {
+    const dataProvider = new TestDataProvider(20, 5);
+    component.dataProvider = dataProvider;
+    component.length = 20;
+    component.headers = dataProvider.headerDef;
+    component.selectable = true;
+    component.ngOnChanges({
+      'dataProvider': new SimpleChange(null, null, true),
+      'headers': new SimpleChange(null, null, true),
+      'length': new SimpleChange(null, null, true),
+    });
+    fixture.detectChanges();
+
+    testTableContent(20, 5, 1, true);
   });
 
 });
