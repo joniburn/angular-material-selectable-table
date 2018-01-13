@@ -2,13 +2,20 @@
   <cdk-table [dataSource]="dataSource" *ngIf="headerKeys">
 
     <ng-container cdkColumnDef="_checkbox">
-      <cdk-header-cell *cdkHeaderCellDef>
-        <mat-checkbox [color]="'primary'">
+      <cdk-header-cell class="mst-checkbox-cell" *cdkHeaderCellDef>
+        <mat-checkbox
+          [color]="'primary'"
+          [checked]="selectionState === 2"
+          [indeterminate]="selectionState === 1">  <!-- SelectionState.PARTIAL = 1, ALL = 2 -->
         </mat-checkbox>
+        <div class="mst-checkbox-overlay" (click)="onClickHeaderCheckbox()"></div>
       </cdk-header-cell>
-      <cdk-cell *cdkCellDef="let row">
-        <mat-checkbox [color]="'primary'">
+      <cdk-cell class="mst-checkbox-cell" *cdkCellDef="let row">
+        <mat-checkbox
+          [color]="'primary'"
+          [checked]="selection.isSelected(row)">
         </mat-checkbox>
+        <div class="mst-checkbox-overlay" (click)="onClickCheckbox(row)"></div>
       </cdk-cell>
     </ng-container>
 

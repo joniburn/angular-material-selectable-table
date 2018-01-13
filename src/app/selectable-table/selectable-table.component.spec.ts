@@ -6,7 +6,11 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { CdkTableModule } from '@angular/cdk/table';
-import { MatCheckboxModule, MatPaginatorModule } from '@angular/material';
+import {
+  MatCheckboxModule,
+  MatPaginatorModule,
+  MatCheckbox,
+} from '@angular/material';
 
 import { SelectableTableComponent } from './selectable-table.component';
 import { SelectableTableDataProvider } from './data-provider';
@@ -143,10 +147,10 @@ describe('SelectableTableComponent', () => {
     testTableContent(7, 5, 21);
   });
 
-  it('チェックボックスを表示できること', () => {
-    const dataProvider = new TestDataProvider(20, 5);
+  it('各行をチェックボックスで選択できること', () => {
+    const dataProvider = new TestDataProvider(22, 5);
     component.dataProvider = dataProvider;
-    component.length = 20;
+    component.length = 22;
     component.headers = dataProvider.headerDef;
     component.selectable = true;
     component.ngOnChanges({
@@ -156,7 +160,93 @@ describe('SelectableTableComponent', () => {
     });
     fixture.detectChanges();
 
+    // チェックボックスを表示できること
     testTableContent(20, 5, 1, true);
+
+    // ヘッダーのチェックボックス
+    const headerCheckbox = fixture.debugElement.query(By.css('cdk-header-cell.mst-checkbox-cell > mat-checkbox'));
+    const headerCheckboxComponent = headerCheckbox.componentInstance as MatCheckbox;
+    const headerCheckboxOverlay = fixture.debugElement.query(By.css('cdk-header-cell.mst-checkbox-cell > .mst-checkbox-overlay'));
+    const allCheckboxes = fixture.debugElement.queryAll(By.css('cdk-cell.mst-checkbox-cell > mat-checkbox'));
+    allCheckboxes.forEach((checkbox) => {
+      const checkboxComponent = checkbox.componentInstance as MatCheckbox;
+      expect(headerCheckboxComponent.checked).toBe(false,
+        '最初はヘッダーのチェックボックスがチェックされていないこと');
+      expect(checkboxComponent.checked).toBe(false,
+        '最初は各行のチェックボックスがチェックされていないこと');
+    });
+    headerCheckboxOverlay.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    allCheckboxes.forEach((checkbox) => {
+      const checkboxComponent = checkbox.componentInstance as MatCheckbox;
+      expect(headerCheckboxComponent.checked).toBe(true,
+        'ヘッダーのチェックボックスクリックでヘッダーのチェックボックスがチェックされること');
+      expect(checkboxComponent.checked).toBe(true,
+        'ヘッダーのチェックボックスクリックで各行のチェックボックスがチェックされること');
+    });
+    headerCheckboxOverlay.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    allCheckboxes.forEach((checkbox) => {
+      const checkboxComponent = checkbox.componentInstance as MatCheckbox;
+      expect(headerCheckboxComponent.checked).toBe(false,
+        'もう1回ヘッダーのチェックボックスクリックでヘッダーのチェックボックスがクリアされること');
+      expect(checkboxComponent.checked).toBe(false,
+        'もう1回ヘッダーのチェックボックスクリックで全てのチェックボックスがクリアされること');
+    });
+
+    // 各行のチェックボックス
+    const rowCheckboxOverlays = fixture.debugElement.queryAll(By.css('cdk-cell.mst-checkbox-cell > .mst-checkbox-overlay'));
+    expect(rowCheckboxOverlays.length).toBe(allCheckboxes.length, '各行のチェックボックスとそのオーバーレイの数が等しいこと');
+    for (let i = 0; i < allCheckboxes.length; i++) {
+      const overlay = rowCheckboxOverlays[i];
+      const checkboxComponent = allCheckboxes[i].componentInstance as MatCheckbox;
+      overlay.triggerEventHandler('click', null);
+      fixture.detectChanges();
+      expect(checkboxComponent.checked).toBe(true, '各行のチェックボックスクリックでチェックされること');
+      if (i < allCheckboxes.length - 1) {
+        expect(headerCheckboxComponent.indeterminate).toBe(true,
+          '最後の1行をチェックするまでヘッダーのチェックボックスがindeterminate表示になること');
+      } else {
+        expect(headerCheckboxComponent.checked).toBe(true, '全行クリックでヘッダーのチェックボックスがオンになること');
+      }
+    }
+
+    // 途中行のクリック
+    const rowsToClick = [2, 5, 10];
+    rowsToClick.forEach((row) => {
+      const overlay = rowCheckboxOverlays[row];
+      overlay.triggerEventHandler('click', null);
+    });
+    fixture.detectChanges();
+    expect(headerCheckboxComponent.indeterminate).toBe(true,
+      '何行かチェックを外すとヘッダーのチェックボックスがindeterminate表示になること');
+    for (let i = 0; i < allCheckboxes.length; i++) {
+      const checkboxComponent = allCheckboxes[i].componentInstance as MatCheckbox;
+      const expectedCheck = rowsToClick.findIndex((item) => item === i) === -1;
+      expect(checkboxComponent.checked).toBe(expectedCheck, `クリックした行のチェックが外されること (${i + 1}行目)`);
+    }
+    headerCheckboxOverlay.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    allCheckboxes.forEach((checkbox) => {
+      const checkboxComponent = checkbox.componentInstance as MatCheckbox;
+      expect(headerCheckboxComponent.checked).toBe(true,
+        '一部の行だけ選択された状態でヘッダーのチェックボックスをクリックするとヘッダーのチェックボックスがチェックされること');
+      expect(checkboxComponent.checked).toBe(true,
+        '一部の行だけ選択された状態でヘッダーのチェックボックスをクリックすると全行のチェックボックスがチェックされること');
+    });
+
+    // ページング
+    const nextButton = fixture.debugElement.query(By.css('.mat-paginator-navigation-next'));
+    nextButton.triggerEventHandler('click', {button: 0});
+    fixture.detectChanges();
+    const nextPagesCheckboxes = fixture.debugElement.queryAll(By.css('cdk-cell.mst-checkbox-cell > mat-checkbox'));
+    nextPagesCheckboxes.forEach((checkbox) => {
+      const checkboxComponent = checkbox.componentInstance as MatCheckbox;
+      expect(headerCheckboxComponent.checked).toBe(false,
+        '次ページを表示するとヘッダーのチェックボックスがクリアされること');
+      expect(checkboxComponent.checked).toBe(false,
+        '次ページを表示すると各行のチェックボックスがクリアされること');
+    });
   });
 
 });

@@ -35,3 +35,18 @@ cdk-header-cell {
 cdk-cell {
   text-align: right;
 }
+
+.mst-checkbox-cell {
+  $hpad: 8px;
+  padding-left: $hpad;
+  padding-right: $hpad;
+  position: relative;
+}
+
+.mst-checkbox-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
