@@ -45,3 +45,12 @@
     margin-bottom: 20px;
   }
 }
+
+.checkbox-preview {
+  display: flex;
+  flex-direction: row;
+
+  .checkbox-state {
+    margin-left: 20px;
+  }
+}

@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
-import { SimpleChange } from '@angular/core';
+import { SimpleChange, Component, ViewChild } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -16,12 +16,14 @@ import { SelectableTableComponent } from './selectable-table.component';
 import { SelectableTableDataProvider } from './data-provider';
 
 describe('SelectableTableComponent', () => {
+  let testHostComponent: TestHostComponent;
   let component: SelectableTableComponent;
-  let fixture: ComponentFixture<SelectableTableComponent>;
+  let fixture: ComponentFixture<TestHostComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
+        TestHostComponent,
         SelectableTableComponent,
       ],
       imports: [
@@ -35,9 +37,10 @@ describe('SelectableTableComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SelectableTableComponent);
-    component = fixture.componentInstance;
+    fixture = TestBed.createComponent(TestHostComponent);
+    testHostComponent = fixture.componentInstance;
     fixture.detectChanges();
+    component = testHostComponent.testTarget;
   });
 
   it('コンポーネントを初期化できること', () => {
@@ -212,7 +215,7 @@ describe('SelectableTableComponent', () => {
     }
 
     // 途中行のクリック
-    const rowsToClick = [2, 5, 10];
+    const rowsToClick = [2, 10, 5];
     rowsToClick.forEach((row) => {
       const overlay = rowCheckboxOverlays[row];
       overlay.triggerEventHandler('click', null);
@@ -249,6 +252,67 @@ describe('SelectableTableComponent', () => {
     });
   });
 
+  it('チェック状態を通知できること', () => {
+    const dataProvider = new TestDataProvider(30, 5);
+    component.dataProvider = dataProvider;
+    component.length = 30;
+    component.headers = dataProvider.headerDef;
+    component.selectable = true;
+    component.ngOnChanges({
+      'dataProvider': new SimpleChange(null, null, true),
+      'headers': new SimpleChange(null, null, true),
+      'length': new SimpleChange(null, null, true),
+    });
+    fixture.detectChanges();
+
+    // 1行目のチェックボックスをクリックする
+    const rowCheckboxOverlays = fixture.debugElement.queryAll(By.css('cdk-cell.mst-checkbox-cell > .mst-checkbox-overlay'));
+    rowCheckboxOverlays[0].triggerEventHandler('click', null);
+    fixture.detectChanges();
+    expect(testHostComponent.selectedRows).toEqual([0], '1行目をチェックすると通知されること');
+
+    // もう何行かチェックする
+    const rowsToClick = [1, 19, 7];
+    rowsToClick.forEach((row) => {
+      const overlay = rowCheckboxOverlays[row];
+      overlay.triggerEventHandler('click', null);
+    });
+    fixture.detectChanges();
+    expect(testHostComponent.selectedRows).toEqual([0, 1, 7, 19], '複数行のチェック状態が通知されること');
+
+    // ヘッダー行のクリックで全行選択する
+    const headerCheckboxOverlay = fixture.debugElement.query(By.css('cdk-header-cell.mst-checkbox-cell > .mst-checkbox-overlay'));
+    headerCheckboxOverlay.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    expect(testHostComponent.selectedRows).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+      12, 13, 14, 15, 16, 17, 18, 19], '全行をチェックした状態が通知されること');
+
+    // ヘッダーのクリックで全行クリアする
+    headerCheckboxOverlay.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    expect(testHostComponent.selectedRows).toEqual([], '全行をクリアした状態が通知されること');
+
+    // ページング; 何行かチェックした状態からページングする
+    const rowsToClick2 = [0, 1, 10, 19];
+    rowsToClick2.forEach((row) => {
+      const overlay = rowCheckboxOverlays[row];
+      overlay.triggerEventHandler('click', null);
+    });
+    fixture.detectChanges();
+    const nextButton = fixture.debugElement.query(By.css('.mat-paginator-navigation-next'));
+    nextButton.triggerEventHandler('click', {button: 0});
+    fixture.detectChanges();
+    expect(testHostComponent.selectedRows).toEqual([], 'ページングにより全行をクリアした状態が通知されること');
+
+    // 2ページ目のチェック
+    const rowsToClick3 = [1, 2, 3, 9];
+    rowsToClick3.forEach((row) => {
+      const overlay = rowCheckboxOverlays[row];
+      overlay.triggerEventHandler('click', null);
+    });
+    fixture.detectChanges();
+    expect(testHostComponent.selectedRows).toEqual([21, 22, 23, 29], '2ページ目は通算行番号で通知されること');
+  });
 });
 
 /**
@@ -302,4 +366,31 @@ class TestDataProvider implements SelectableTableDataProvider {
  */
 function pad(num: number): string {
   return `0${num}`.slice(-2);
+}
+
+@Component({
+  template: `
+    <mst-selectable-table
+      [selectable]="selectable"
+      [dataProvider]="dataProvider"
+      [length]="length"
+      [pageSize]="pageSize"
+      [headers]="dataProvider?.headerDef"
+      (selectionChange)="onSelectionChange($event)">
+    </mst-selectable-table>`
+})
+class TestHostComponent {
+  selectable = false;
+  dataProvider: TestDataProvider;
+  length: number;
+  pageSize = 20;
+
+  @ViewChild(SelectableTableComponent)
+  testTarget: SelectableTableComponent;
+
+  selectedRows: number[] = [];
+
+  onSelectionChange(selection: number[]) {
+    this.selectedRows = selection;
+  }
 }

@@ -15,9 +15,15 @@ export class AppComponent {
   dataProvider = new SampleDataProvider();
   tableThemeIsDark = false;
 
+  selectedRows = '[]';
+
   constructor(
     public themeManagerService: ThemeManagerService,
   ) {
+  }
+
+  onSelectionChange(selection: number[]) {
+    this.selectedRows = JSON.stringify(selection);
   }
 }
 

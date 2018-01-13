@@ -1,4 +1,6 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component, EventEmitter, Input, OnChanges, Output, SimpleChanges,
+} from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
 
@@ -54,6 +56,14 @@ export class SelectableTableComponent implements OnChanges {
   pageSize = 20;
 
   /**
+   * チェックボックスの選択状況が変化した際に通知される。
+   *
+   * 選択された行番号の配列が通知される。行番号は0オリジン。
+   */
+  @Output()
+  selectionChange = new EventEmitter<number[]>();
+
+  /**
    * ページ番号。0オリジン。
    */
   pageIndex = 0;
@@ -70,15 +80,16 @@ export class SelectableTableComponent implements OnChanges {
   ) {
     this.selection.onChange.subscribe(() => {
       this.updateSelectionState();
+      this.emitSelectionChange();
     });
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['dataProvider']) {
+    if (changes['dataProvider'] && this.dataProvider) {
       this.dataSource = new TableDataSource(this.dataProvider);
       this.dataSource.setPage(this.pageIndex, this.pageSize);
     }
-    if (changes['headers']) {
+    if (changes['headers'] && this.headers) {
       this.headerKeys = Object.keys(this.headers);
       this.headerKeysAndCheckbox = Array.from(this.headerKeys);
       if (this.selectable) {
@@ -118,6 +129,13 @@ export class SelectableTableComponent implements OnChanges {
     } else {
       this.selectionState = SelectionState.PARTIAL;
     }
+  }
+
+  private emitSelectionChange() {
+    const pageOffset = this.pageIndex * this.pageSize;  // 0行目の通算行番号
+    const selectedRowNumberList = this.selection.selected.map((record) => record.rowNumber + pageOffset);
+    selectedRowNumberList.sort((a, b) => a < b ? -1 : 1);
+    this.selectionChange.emit(selectedRowNumberList);
   }
 
 }

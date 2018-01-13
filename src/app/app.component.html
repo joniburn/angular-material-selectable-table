@@ -29,19 +29,25 @@
   </div>
 
   <div>チェックボックスあり</div>
-  <div class="table-sample"
-      [class.light-theme]="!themeManagerService.isDark"
-      [class.dark-theme]="themeManagerService.isDark"
-      [class.light-table]="!tableThemeIsDark"
-      [class.dark-table]="tableThemeIsDark">
-    <mat-card>
-      <mst-selectable-table
-        [selectable]="true"
-        [dataProvider]="dataProvider"
-        [length]="100"
-        [pageSize]="10"
-        [headers]="dataProvider.headerDef">
-      </mst-selectable-table>
-    </mat-card>
+  <div class="checkbox-preview">
+    <div class="table-sample"
+        [class.light-theme]="!themeManagerService.isDark"
+        [class.dark-theme]="themeManagerService.isDark"
+        [class.light-table]="!tableThemeIsDark"
+        [class.dark-table]="tableThemeIsDark">
+      <mat-card>
+        <mst-selectable-table
+          [selectable]="true"
+          [dataProvider]="dataProvider"
+          [length]="100"
+          [pageSize]="10"
+          [headers]="dataProvider.headerDef"
+          (selectionChange)="onSelectionChange($event)">
+        </mst-selectable-table>
+      </mat-card>
+    </div>
+    <div class="checkbox-state">
+      選択された行: {{selectedRows}}
+    </div>
   </div>
 </mat-sidenav-container>

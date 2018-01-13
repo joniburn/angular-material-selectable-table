@@ -5,7 +5,7 @@ import { DataSource } from '@angular/cdk/collections';
 import { SelectableTableDataProvider } from './data-provider';
 
 export interface TableRecord {
-  rowNumber: number;  // 行番号。1オリジン。
+  rowNumber: number;  // 行番号。0オリジン。
   data: { [key: string]: string };
 }
 
