@@ -15,6 +15,7 @@ export class AppComponent {
   dataProvider = new SampleDataProvider();
   tableThemeIsDark = false;
   tableIsClickable = true;
+  tableIsSelectable = true;
 
   selectedRows = '[]';
   clickedRow = '';

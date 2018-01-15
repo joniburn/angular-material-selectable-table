@@ -85,8 +85,8 @@ export class SelectableTableComponent implements OnChanges {
   pageIndex = 0;
 
   dataSource: TableDataSource;
-  headerKeys: string[];
-  headerKeysAndCheckbox: string[];
+  headerKeys: string[] = [];
+  headerKeysAndCheckbox: string[] = [];
 
   // チェックボックスの選択状況
   selection = new SelectionModel<TableRecord>(true);
@@ -107,10 +107,10 @@ export class SelectableTableComponent implements OnChanges {
     }
     if (changes['headers'] && this.headers) {
       this.headerKeys = Object.keys(this.headers);
-      this.headerKeysAndCheckbox = Array.from(this.headerKeys);
-      if (this.selectable) {
-        this.headerKeysAndCheckbox.splice(0, 0, '_checkbox');
-      }
+      this.updateHeaderKeys();
+    }
+    if (changes['selectable']) {
+      this.updateHeaderKeys();
     }
   }
 
@@ -140,6 +140,13 @@ export class SelectableTableComponent implements OnChanges {
     if (this.clickable) {
       const rowNumber = row.rowNumber + (this.pageIndex * this.pageSize);
       this.rowClicked.emit(rowNumber);
+    }
+  }
+
+  private updateHeaderKeys() {
+    this.headerKeysAndCheckbox = Array.from(this.headerKeys);
+    if (this.selectable) {
+      this.headerKeysAndCheckbox.splice(0, 0, '_checkbox');
     }
   }
 
