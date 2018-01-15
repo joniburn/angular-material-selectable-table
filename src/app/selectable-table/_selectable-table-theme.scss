@@ -22,8 +22,13 @@
   cdk-header-cell {
     background-color: mat-color(map-get($table-theme, background), app-bar);
   }
-  cdk-cell {
+  cdk-table {
     background-color: mat-color(map-get($table-theme, background), background);
+  }
+
+  // マウスホバー
+  cdk-row.mst-clickable:hover cdk-cell {
+    background-color: mat-color(map-get($table-theme, background), hover);
   }
 
   // チェックボックス

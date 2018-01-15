@@ -25,7 +25,9 @@
     </ng-container>
 
     <cdk-header-row *cdkHeaderRowDef="headerKeysAndCheckbox"></cdk-header-row>
-    <cdk-row *cdkRowDef="let row; columns: headerKeysAndCheckbox;"></cdk-row>
+    <cdk-row *cdkRowDef="let row; columns: headerKeysAndCheckbox;"
+             [class.mst-clickable]="clickable">
+    </cdk-row>
 
   </cdk-table>
 </div>

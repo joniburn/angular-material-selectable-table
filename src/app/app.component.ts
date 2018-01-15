@@ -14,8 +14,10 @@ import { ThemeManagerService } from './theme-manager.service';
 export class AppComponent {
   dataProvider = new SampleDataProvider();
   tableThemeIsDark = false;
+  tableIsClickable = true;
 
   selectedRows = '[]';
+  clickedRow = '';
 
   constructor(
     public themeManagerService: ThemeManagerService,
@@ -24,6 +26,10 @@ export class AppComponent {
 
   onSelectionChange(selection: number[]) {
     this.selectedRows = JSON.stringify(selection);
+  }
+
+  onRowClicked(row: number) {
+    this.clickedRow = '' + row;
   }
 }
 

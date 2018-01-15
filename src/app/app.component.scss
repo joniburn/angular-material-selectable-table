@@ -40,10 +40,10 @@
       @include themed-table-dark($dark-theme);
     }
   }
+}
 
-  &:not(:last-child) {
-    margin-bottom: 20px;
-  }
+.checkbox-preview:not(:last-child) {
+  margin-bottom: 20px;
 }
 
 .checkbox-preview {

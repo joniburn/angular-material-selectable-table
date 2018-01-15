@@ -10,22 +10,34 @@
         Table theme is dark
       </mat-slide-toggle>
     </div>
+    <div>
+      <mat-slide-toggle [color]="'primary'" [(ngModel)]="tableIsClickable">
+        Table is clickable
+      </mat-slide-toggle>
+    </div>
   </div>
 
   <div>チェックボックスなし</div>
-  <div class="table-sample"
-      [class.light-theme]="!themeManagerService.isDark"
-      [class.dark-theme]="themeManagerService.isDark"
-      [class.light-table]="!tableThemeIsDark"
-      [class.dark-table]="tableThemeIsDark">
-    <mat-card>
-      <mst-selectable-table
-        [dataProvider]="dataProvider"
-        [length]="100"
-        [pageSize]="10"
-        [headers]="dataProvider.headerDef">
-      </mst-selectable-table>
-    </mat-card>
+  <div class="checkbox-preview">
+    <div class="table-sample"
+        [class.light-theme]="!themeManagerService.isDark"
+        [class.dark-theme]="themeManagerService.isDark"
+        [class.light-table]="!tableThemeIsDark"
+        [class.dark-table]="tableThemeIsDark">
+      <mat-card>
+        <mst-selectable-table
+          [clickable]="tableIsClickable"
+          [dataProvider]="dataProvider"
+          [length]="100"
+          [pageSize]="10"
+          [headers]="dataProvider.headerDef"
+          (rowClicked)="onRowClicked($event)">
+        </mst-selectable-table>
+      </mat-card>
+    </div>
+    <div class="checkbox-state" *ngIf="tableIsClickable">
+      クリックされた行: {{clickedRow}}
+    </div>
   </div>
 
   <div>チェックボックスあり</div>
@@ -38,6 +50,7 @@
       <mat-card>
         <mst-selectable-table
           [selectable]="true"
+          [clickable]="tableIsClickable"
           [dataProvider]="dataProvider"
           [length]="100"
           [pageSize]="10"
