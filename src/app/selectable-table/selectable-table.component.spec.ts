@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
-import { SimpleChange, Component, ViewChild } from '@angular/core';
+import { SimpleChange, Component, ViewChild, DebugElement } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -313,6 +313,47 @@ describe('SelectableTableComponent', () => {
     fixture.detectChanges();
     expect(testHostComponent.selectedRows).toEqual([21, 22, 23, 29], '2ページ目は通算行番号で通知されること');
   });
+
+  it('行のクリックができること', () => {
+    const dataProvider = new TestDataProvider(30, 5);
+    component.dataProvider = dataProvider;
+    component.length = 30;
+    component.headers = dataProvider.headerDef;
+    component.clickable = true;
+    component.ngOnChanges({
+      'dataProvider': new SimpleChange(null, null, true),
+      'headers': new SimpleChange(null, null, true),
+      'length': new SimpleChange(null, null, true),
+    });
+    fixture.detectChanges();
+
+    const rowList = fixture.debugElement.queryAll(By.css('cdk-row'));
+    function cell(row: number, col: number): DebugElement {
+      const cellList = rowList[row].queryAll(By.css('cdk-cell'));
+      return cellList[col];
+    }
+
+    // 1ページ目をクリック
+    for (let row = 0; row < 20; row++) {
+      cell(row, row % 5).triggerEventHandler('click', null);
+      fixture.detectChanges();
+      expect(testHostComponent.clickedRow).toBe(row, '1ページ目のクリックした行が通知されること');
+    }
+
+    // 2ページ目をクリック
+    const nextButton = fixture.debugElement.query(By.css('.mat-paginator-navigation-next'));
+    nextButton.triggerEventHandler('click', {button: 0});
+    fixture.detectChanges();
+    for (let row = 0; row < 10; row++) {
+      cell(row, row % 5).triggerEventHandler('click', null);
+      fixture.detectChanges();
+      expect(testHostComponent.clickedRow).toBe(row + 20, '2ページ目のクリックした行が通知されること');
+    }
+
+    // TODO チェックボックスありの場合
+
+  });
+
 });
 
 /**
@@ -376,7 +417,8 @@ function pad(num: number): string {
       [length]="length"
       [pageSize]="pageSize"
       [headers]="dataProvider?.headerDef"
-      (selectionChange)="onSelectionChange($event)">
+      (selectionChange)="onSelectionChange($event)"
+      (rowClicked)="onRowClicked($event)">
     </mst-selectable-table>`
 })
 class TestHostComponent {
@@ -389,8 +431,13 @@ class TestHostComponent {
   testTarget: SelectableTableComponent;
 
   selectedRows: number[] = [];
+  clickedRow = -1;
 
   onSelectionChange(selection: number[]) {
     this.selectedRows = selection;
+  }
+
+  onRowClicked(row: number) {
+    this.clickedRow = row;
   }
 }

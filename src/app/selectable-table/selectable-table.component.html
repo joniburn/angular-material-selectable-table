@@ -21,7 +21,7 @@
 
     <ng-container *ngFor="let key of headerKeys" cdkColumnDef="{{key}}">
       <cdk-header-cell *cdkHeaderCellDef>{{headers[key]}}</cdk-header-cell>
-      <cdk-cell *cdkCellDef="let row">{{row.data[key]}}</cdk-cell>
+      <cdk-cell *cdkCellDef="let row" (click)="onClickRow(row)">{{row.data[key]}}</cdk-cell>
     </ng-container>
 
     <cdk-header-row *cdkHeaderRowDef="headerKeysAndCheckbox"></cdk-header-row>

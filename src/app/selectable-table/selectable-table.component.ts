@@ -35,6 +35,12 @@ export class SelectableTableComponent implements OnChanges {
   selectable = false;
 
   /**
+   * trueを指定すると、行をクリックした際に行番号を通知する。
+   */
+  @Input()
+  clickable = false;
+
+  /**
    * データの総件数。
    */
   @Input()
@@ -59,9 +65,19 @@ export class SelectableTableComponent implements OnChanges {
    * チェックボックスの選択状況が変化した際に通知される。
    *
    * 選択された行番号の配列が通知される。行番号は0オリジン。
+   * 2ページ目以降の場合、通算の行番号が通知される。
    */
   @Output()
   selectionChange = new EventEmitter<number[]>();
+
+  /**
+   * 行をクリックした際に通知される。
+   *
+   * クリックした行番号が通知される。行番号は0オリジン。
+   * 2ページ目以降の場合、通算の行番号が通知される。
+   */
+  @Output()
+  rowClicked = new EventEmitter<number>();
 
   /**
    * ページ番号。0オリジン。
@@ -118,6 +134,13 @@ export class SelectableTableComponent implements OnChanges {
 
   onClickCheckbox(row: TableRecord) {
     this.selection.toggle(row);
+  }
+
+  onClickRow(row: TableRecord) {
+    if (this.clickable) {
+      const rowNumber = row.rowNumber + (this.pageIndex * this.pageSize);
+      this.rowClicked.emit(rowNumber);
+    }
   }
 
   private updateSelectionState() {
