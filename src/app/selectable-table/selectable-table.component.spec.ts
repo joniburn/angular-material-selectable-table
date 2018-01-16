@@ -327,8 +327,8 @@ describe('SelectableTableComponent', () => {
     });
     fixture.detectChanges();
 
-    const rowList = fixture.debugElement.queryAll(By.css('cdk-row'));
     function cell(row: number, col: number): DebugElement {
+      const rowList = fixture.debugElement.queryAll(By.css('cdk-row'));
       const cellList = rowList[row].queryAll(By.css('cdk-cell'));
       return cellList[col];
     }
@@ -350,8 +350,33 @@ describe('SelectableTableComponent', () => {
       expect(testHostComponent.clickedRow).toBe(row + 20, '2ページ目のクリックした行が通知されること');
     }
 
-    // TODO チェックボックスありの場合
+    // チェックボックスありの場合: 準備
+    component.selectable = true;
+    component.ngOnChanges({
+      'selectable': new SimpleChange(null, null, true),
+    });
+    fixture.detectChanges();
+    // 1ページ目に戻る
+    const previousButton = fixture.debugElement.query(By.css('.mat-paginator-navigation-previous'));
+    previousButton.triggerEventHandler('click', {button: 0});
+    fixture.detectChanges();
+    testTableContent(20, 5, 1, true);
 
+    // 1ページ目をクリック
+    for (let row = 0; row < 20; row++) {
+      cell(row, (row % 5) + 1).triggerEventHandler('click', null);
+      fixture.detectChanges();
+      expect(testHostComponent.clickedRow).toBe(row, '1ページ目のクリックした行が通知されること(チェックボックスあり)');
+    }
+
+    // 2ページ目をクリック
+    nextButton.triggerEventHandler('click', {button: 0});
+    fixture.detectChanges();
+    for (let row = 0; row < 10; row++) {
+      cell(row, (row % 5) + 1).triggerEventHandler('click', null);
+      fixture.detectChanges();
+      expect(testHostComponent.clickedRow).toBe(row + 20, '2ページ目のクリックした行が通知されること(チェックボックスあり)');
+    }
   });
 
 });
