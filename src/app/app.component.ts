@@ -1,4 +1,5 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import 'rxjs/add/operator/delay';
+import { AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -11,11 +12,12 @@ import { ThemeManagerService } from './theme-manager.service';
   styleUrls: ['./app.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   dataProvider = new SampleDataProvider();
   tableThemeIsDark = false;
   tableIsClickable = true;
   tableIsSelectable = true;
+  length: number;
 
   selectedRows = '[]';
   clickedRow = '';
@@ -23,6 +25,11 @@ export class AppComponent {
   constructor(
     public themeManagerService: ThemeManagerService,
   ) {
+  }
+
+  ngAfterViewInit() {
+    // 画面表示後5秒間はローディング表示にする
+    setTimeout(() => this.length = 100, 5000);
   }
 
   onSelectionChange(selection: number[]) {
@@ -71,7 +78,7 @@ class SampleDataProvider implements SelectableTableDataProvider {
         'c3': c3Text,
       });
     }
-    return new BehaviorSubject(data);
+    return new BehaviorSubject(data).delay(2000);  // 次ページの表示に2秒かける
   }
 
 }
