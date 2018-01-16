@@ -1,10 +1,13 @@
 import 'rxjs/add/operator/delay';
-import { AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { SelectableTableDataProvider } from './selectable-table';
 import { ThemeManagerService } from './theme-manager.service';
+
+// 表示行数
+const ROW_COUNT = 100;
 
 @Component({
   selector: 'mst-root',
@@ -12,12 +15,11 @@ import { ThemeManagerService } from './theme-manager.service';
   styleUrls: ['./app.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent {
   dataProvider = new SampleDataProvider();
   tableThemeIsDark = false;
   tableIsClickable = true;
   tableIsSelectable = true;
-  length: number;
 
   selectedRows = '[]';
   clickedRow = '';
@@ -25,11 +27,6 @@ export class AppComponent implements AfterViewInit {
   constructor(
     public themeManagerService: ThemeManagerService,
   ) {
-  }
-
-  ngAfterViewInit() {
-    // 画面表示後5秒間はローディング表示にする
-    setTimeout(() => this.length = 100, 5000);
   }
 
   onSelectionChange(selection: number[]) {
@@ -59,6 +56,10 @@ class SampleDataProvider implements SelectableTableDataProvider {
     'c2': 'Col 2',
     'c3': 'Col 3',
   };
+
+  getRowCount(): Observable<number> {
+    return new BehaviorSubject(ROW_COUNT).delay(2000);
+  }
 
   getRecords(pageIndex: number, pageSize: number): Observable<{ [key: string]: string }[]> {
     const startRow = 1 + (pageIndex * pageSize);

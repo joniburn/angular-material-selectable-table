@@ -1,3 +1,4 @@
+import 'rxjs/add/operator/first';
 import {
   Component, EventEmitter, Input, OnChanges, Output, SimpleChanges,
 } from '@angular/core';
@@ -41,12 +42,6 @@ export class SelectableTableComponent implements OnChanges {
   clickable = false;
 
   /**
-   * データの総件数。
-   */
-  @Input()
-  length = 0;
-
-  /**
    * ヘッダーに表示するキー名と、その表示文字列のマッピング。
    *
    * キー名は、SelectableTableDataProvider#getRecords()から
@@ -80,6 +75,11 @@ export class SelectableTableComponent implements OnChanges {
   rowClicked = new EventEmitter<number>();
 
   /**
+   * データの総件数。
+   */
+  length: number;
+
+  /**
    * ページ番号。0オリジン。
    */
   pageIndex = 0;
@@ -92,6 +92,12 @@ export class SelectableTableComponent implements OnChanges {
   selection = new SelectionModel<TableRecord>(true);
   selectionState = SelectionState.NONE;
 
+  // 最初のデータを読み込むまでfalse
+  initialized = false;
+
+  // ページ移動の間true
+  loading = false;
+
   constructor(
   ) {
     this.selection.onChange.subscribe(() => {
@@ -102,8 +108,23 @@ export class SelectableTableComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['dataProvider'] && this.dataProvider) {
+      this.initialized = false;
       this.dataSource = new TableDataSource(this.dataProvider);
-      this.dataSource.setPage(this.pageIndex, this.pageSize);
+      this.dataProvider.getRowCount().subscribe((rowCount) => {
+        this.length = rowCount;
+        const pageEvent = <PageEvent>{
+          length: rowCount,
+          pageIndex: 0,
+          pageSize: this.pageSize,
+        };
+        this.onPageEvent(pageEvent);
+      });
+      // this.dataSource.dataChange.first().subscribe(() => {
+      //   this.initialized = true;
+      // });
+      // this.dataSource.dataChange.subscribe(() => {
+      //   this.loading = false;
+      // });
     }
     if (changes['headers'] && this.headers) {
       this.headerKeys = Object.keys(this.headers);

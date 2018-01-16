@@ -109,7 +109,6 @@ describe('SelectableTableComponent', () => {
   it('データを表示できること', () => {
     const dataProvider = new TestDataProvider(20, 5);
     component.dataProvider = dataProvider;
-    component.length = 20;
     component.headers = dataProvider.headerDef;
     component.ngOnChanges({
       'dataProvider': new SimpleChange(null, null, true),
@@ -124,7 +123,6 @@ describe('SelectableTableComponent', () => {
   it('ページング表示できること', () => {
     const dataProvider = new TestDataProvider(27, 5);
     component.dataProvider = dataProvider;
-    component.length = 27;
     component.pageSize = 10;
     component.headers = dataProvider.headerDef;
     component.ngOnChanges({
@@ -153,7 +151,6 @@ describe('SelectableTableComponent', () => {
   it('各行をチェックボックスで選択できること', () => {
     const dataProvider = new TestDataProvider(22, 5);
     component.dataProvider = dataProvider;
-    component.length = 22;
     component.headers = dataProvider.headerDef;
     component.selectable = true;
     component.ngOnChanges({
@@ -255,7 +252,6 @@ describe('SelectableTableComponent', () => {
   it('チェック状態を通知できること', () => {
     const dataProvider = new TestDataProvider(30, 5);
     component.dataProvider = dataProvider;
-    component.length = 30;
     component.headers = dataProvider.headerDef;
     component.selectable = true;
     component.ngOnChanges({
@@ -317,7 +313,6 @@ describe('SelectableTableComponent', () => {
   it('行のクリックができること', () => {
     const dataProvider = new TestDataProvider(30, 5);
     component.dataProvider = dataProvider;
-    component.length = 30;
     component.headers = dataProvider.headerDef;
     component.clickable = true;
     component.ngOnChanges({
@@ -407,6 +402,10 @@ class TestDataProvider implements SelectableTableDataProvider {
     }
   }
 
+  getRowCount(): Observable<number> {
+    return new BehaviorSubject<number>(this.nrows);
+  }
+
   getRecords(pageIndex: number, pageSize: number): Observable<{ [key: string]: string }[]> {
     const records: { [key: string]: string }[] = [];
     const startRow = 1 + (pageIndex * pageSize);
@@ -439,7 +438,6 @@ function pad(num: number): string {
     <mst-selectable-table
       [selectable]="selectable"
       [dataProvider]="dataProvider"
-      [length]="length"
       [pageSize]="pageSize"
       [headers]="dataProvider?.headerDef"
       (selectionChange)="onSelectionChange($event)"
@@ -449,7 +447,6 @@ function pad(num: number): string {
 class TestHostComponent {
   selectable = false;
   dataProvider: TestDataProvider;
-  length: number;
   pageSize = 20;
 
   @ViewChild(SelectableTableComponent)

@@ -6,6 +6,11 @@ import { Observable } from 'rxjs/Observable';
 export interface SelectableTableDataProvider {
 
   /**
+   * 総行数を取得する。
+   */
+  getRowCount(): Observable<number>;
+
+  /**
    * テーブルに表示するデータを取得する。
    *
    * @param pageIndex 表示するページ番号。0オリジン。
