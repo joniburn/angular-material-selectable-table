@@ -1,4 +1,4 @@
-import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/skip';
 import {
   Component, EventEmitter, Input, OnChanges, Output, SimpleChanges,
 } from '@angular/core';
@@ -110,6 +110,9 @@ export class SelectableTableComponent implements OnChanges {
     if (changes['dataProvider'] && this.dataProvider) {
       this.initialized = false;
       this.dataSource = new TableDataSource(this.dataProvider);
+      this.dataSource.dataChange.skip(1).subscribe(() => {
+        this.initialized = true;
+      });
       this.dataProvider.getRowCount().subscribe((rowCount) => {
         this.length = rowCount;
         const pageEvent = <PageEvent>{
@@ -119,12 +122,7 @@ export class SelectableTableComponent implements OnChanges {
         };
         this.onPageEvent(pageEvent);
       });
-      // this.dataSource.dataChange.first().subscribe(() => {
-      //   this.initialized = true;
-      // });
-      // this.dataSource.dataChange.subscribe(() => {
-      //   this.loading = false;
-      // });
+      this.dataSource.dataChange.subscribe(() => this.loading = false);
     }
     if (changes['headers'] && this.headers) {
       this.headerKeys = Object.keys(this.headers);
@@ -142,6 +140,7 @@ export class SelectableTableComponent implements OnChanges {
       this.dataSource.setPage(this.pageIndex, this.pageSize);
     }
     this.selection.clear();
+    this.loading = true;
   }
 
   onClickHeaderCheckbox() {

@@ -21,6 +21,34 @@ mat-paginator {
 .mst-table-container {
   max-width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+
+  .mst-loading-overlay {
+    display: flex;  // mat-spinnerを上下中央に配置する
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    mat-spinner {
+      margin: auto;
+    }
+  }
+}
+
+.mst-paginator-container {
+  position: relative;
+
+  // 親要素を覆い隠す
+  .mst-paginator-disabler {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
 }
 
 cdk-header-cell, cdk-cell {

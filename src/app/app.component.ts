@@ -57,6 +57,8 @@ class SampleDataProvider implements SelectableTableDataProvider {
     'c3': 'Col 3',
   };
 
+  private firstRecord = true;
+
   getRowCount(): Observable<number> {
     return new BehaviorSubject(ROW_COUNT).delay(2000);
   }
@@ -79,7 +81,11 @@ class SampleDataProvider implements SelectableTableDataProvider {
         'c3': c3Text,
       });
     }
-    return new BehaviorSubject(data).delay(2000);  // 次ページの表示に2秒かける
+
+    // 次ページの表示に2秒かける
+    const delay = this.firstRecord ? 1000 : 2000;
+    this.firstRecord = false;
+    return new BehaviorSubject(data).delay(delay);
   }
 
 }

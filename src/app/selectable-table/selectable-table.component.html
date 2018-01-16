@@ -1,4 +1,4 @@
-<div class="mst-table-container">
+<div class="mst-table-container" *ngIf="initialized">
   <cdk-table [dataSource]="dataSource" *ngIf="headerKeys">
 
     <ng-container cdkColumnDef="_checkbox">
@@ -30,12 +30,24 @@
     </cdk-row>
 
   </cdk-table>
+
+  <div class="mst-loading-overlay" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+  </div>
 </div>
 
-<mat-paginator
-  [length]="length"
-  [pageIndex]="pageIndex"
-  [pageSize]="pageSize"
-  [pageSizeOptions]="[5, 10, 20, 50]"
-  (page)="onPageEvent($event)">
-</mat-paginator>
+<div class="mst-paginator-container">
+  <mat-paginator *ngIf="initialized"
+    [length]="length"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 20, 50]"
+    (page)="onPageEvent($event)">
+  </mat-paginator>
+
+  <!-- loading=true時はmat-paginatorを覆い隠して操作不可にする -->
+  <div class="mst-paginator-disabler" *ngIf="loading"></div>
+</div>
+
+<mat-spinner *ngIf="!initialized">
+</mat-spinner>

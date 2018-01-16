@@ -1,14 +1,17 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
+import 'rxjs/add/operator/delay';
 import { SimpleChange, Component, ViewChild, DebugElement } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { CdkTableModule } from '@angular/cdk/table';
 import {
   MatCheckboxModule,
   MatPaginatorModule,
+  MatProgressSpinnerModule,
   MatCheckbox,
 } from '@angular/material';
 
@@ -31,6 +34,7 @@ describe('SelectableTableComponent', () => {
         CdkTableModule,
         MatCheckboxModule,
         MatPaginatorModule,
+        MatProgressSpinnerModule,
       ],
     })
     .compileComponents();
@@ -45,8 +49,6 @@ describe('SelectableTableComponent', () => {
 
   it('コンポーネントを初期化できること', () => {
     expect(component).toBeTruthy('コンポーネントを初期化できること');
-    const matPaginator = fixture.debugElement.query(By.css('mat-paginator'));
-    expect(matPaginator).toBeTruthy('mat-paginatorがレンダリングされること');
   });
 
   function testTableContent(nrows: number, ncols: number, startRow: number = 1, hasCheckbox = false) {
@@ -113,7 +115,6 @@ describe('SelectableTableComponent', () => {
     component.ngOnChanges({
       'dataProvider': new SimpleChange(null, null, true),
       'headers': new SimpleChange(null, null, true),
-      'length': new SimpleChange(null, null, true),
     });
     fixture.detectChanges();
 
@@ -128,7 +129,6 @@ describe('SelectableTableComponent', () => {
     component.ngOnChanges({
       'dataProvider': new SimpleChange(null, null, true),
       'headers': new SimpleChange(null, null, true),
-      'length': new SimpleChange(null, null, true),
     });
     fixture.detectChanges();
 
@@ -156,7 +156,6 @@ describe('SelectableTableComponent', () => {
     component.ngOnChanges({
       'dataProvider': new SimpleChange(null, null, true),
       'headers': new SimpleChange(null, null, true),
-      'length': new SimpleChange(null, null, true),
     });
     fixture.detectChanges();
 
@@ -257,7 +256,6 @@ describe('SelectableTableComponent', () => {
     component.ngOnChanges({
       'dataProvider': new SimpleChange(null, null, true),
       'headers': new SimpleChange(null, null, true),
-      'length': new SimpleChange(null, null, true),
     });
     fixture.detectChanges();
 
@@ -318,7 +316,6 @@ describe('SelectableTableComponent', () => {
     component.ngOnChanges({
       'dataProvider': new SimpleChange(null, null, true),
       'headers': new SimpleChange(null, null, true),
-      'length': new SimpleChange(null, null, true),
     });
     fixture.detectChanges();
 
@@ -374,6 +371,65 @@ describe('SelectableTableComponent', () => {
     }
   });
 
+  it('読み込みアニメーションを表示できること', () => {
+    const dataProvider = new TestDataProvider(21, 5, true);
+    component.dataProvider = dataProvider;
+    component.pageSize = 5;
+    component.headers = dataProvider.headerDef;
+    component.ngOnChanges({
+      'dataProvider': new SimpleChange(null, null, true),
+      'headers': new SimpleChange(null, null, true),
+    });
+    fixture.detectChanges();
+
+    const spinner1 = fixture.debugElement.queryAll(By.css('mat-spinner'));
+    expect(spinner1.length).toBe(1, '総件数取得までmat-spinnerが表示されること');
+    const cdkTable1 = fixture.debugElement.queryAll(By.css('cdk-table'));
+    expect(cdkTable1.length).toBe(0, '総件数取得までテーブルが表示されないこと');
+    const paginator1 = fixture.debugElement.queryAll(By.css('mat-paginator'));
+    expect(paginator1.length).toBe(0, '総件数取得までmat-paginatorが表示されないこと');
+
+    // 総件数取得後
+    dataProvider.next();
+    // 1ページ目を表示(読み込み中のまま)
+    const spinner2 = fixture.debugElement.queryAll(By.css('mat-spinner'));
+    expect(spinner2.length).toBe(1, '1ページ目の読み込みが完了するまでmat-spinnerが表示されること');
+    const cdkTable2 = fixture.debugElement.queryAll(By.css('cdk-table'));
+    expect(cdkTable2.length).toBe(0, '1ページ目の読み込みが完了するまでテーブルが表示されないこと');
+    const paginator2 = fixture.debugElement.queryAll(By.css('mat-paginator'));
+    expect(paginator2.length).toBe(0, '1ページ目の読み込みが完了するまでmat-paginatorが表示されないこと');
+
+    // 1ページの読み込み完了
+    dataProvider.next();
+    fixture.detectChanges();
+    const spinner3 = fixture.debugElement.queryAll(By.css('mat-spinner'));
+    expect(spinner3.length).toBe(0, '1ページ目の読み込み完了後にmat-spinnerが表示されないこと');
+    testTableContent(5, 5);  // 1ページ目の読み込み完了後にテーブルが表示されること
+    const paginator3 = fixture.debugElement.queryAll(By.css('mat-paginator'));
+    expect(paginator3.length).toBe(1, '1ページ目の読み込み完了後にmat-paginatorが表示されること');
+
+    // 2ページ目を表示(読み込み中のまま)
+    const nextButton = fixture.debugElement.query(By.css('.mat-paginator-navigation-next'));
+    nextButton.triggerEventHandler('click', {button: 0});
+    fixture.detectChanges();
+    const spinner4 = fixture.debugElement.queryAll(By.css('mat-spinner'));
+    expect(spinner4.length).toBe(1, '2ページ目の読み込み中にmat-spinnerが表示されること');
+    testTableContent(5, 5);  // 2ページ目の読み込み中にテーブルが表示されたままになること
+    const paginator4 = fixture.debugElement.queryAll(By.css('mat-paginator'));
+    expect(paginator4.length).toBe(1, 'ページ読み込み中にmat-paginatorが表示されたままになること');
+    const paginatorDisabler = fixture.debugElement.queryAll(By.css('.mst-paginator-disabler'));
+    expect(paginatorDisabler.length).toBe(1, 'ページ読み込み中にmat-paginatorが操作できないようになること');
+
+    // 2ページ目の読み込み完了
+    dataProvider.next();
+    fixture.detectChanges();
+    const spinner5 = fixture.debugElement.queryAll(By.css('mat-spinner'));
+    expect(spinner5.length).toBe(0, '2ページ目の読み込み完了後にmat-spinnerが表示されないこと');
+    testTableContent(5, 5, 6);  // 2ページ目の読み込み完了後にテーブルが表示されること
+    const paginator5 = fixture.debugElement.queryAll(By.css('mat-paginator'));
+    expect(paginator5.length).toBe(1, '2ページ目の読み込み完了後にmat-paginatorが表示されること');
+  });
+
 });
 
 /**
@@ -391,9 +447,16 @@ class TestDataProvider implements SelectableTableDataProvider {
 
   headerDef: {[key: string]: string};
 
+  private _next: Subject<void>;
+
+  /*
+   * delayにtrueを設定した場合、getRowCount()やgetRecords()が呼ばれても
+   * next()を呼ぶまでデータが更新されない。
+   */
   constructor(
     private nrows: number,
     private ncols: number,
+    private delay = false,
   ) {
     // キー名と表示名のマッピングを作成
     this.headerDef = {};
@@ -403,7 +466,14 @@ class TestDataProvider implements SelectableTableDataProvider {
   }
 
   getRowCount(): Observable<number> {
-    return new BehaviorSubject<number>(this.nrows);
+    if (this.delay) {
+      const subject = new Subject<number>();
+      this._next = new Subject<void>();
+      this._next.subscribe(() => subject.next(this.nrows));
+      return subject;
+    } else {
+      return new BehaviorSubject<number>(this.nrows);
+    }
   }
 
   getRecords(pageIndex: number, pageSize: number): Observable<{ [key: string]: string }[]> {
@@ -419,7 +489,19 @@ class TestDataProvider implements SelectableTableDataProvider {
       }
       records.push(data);
     }
-    return new BehaviorSubject<{ [key: string]: string }[]>(records);
+    if (this.delay) {
+      console.log('delaying getRecords');
+      const subject = new Subject<{ [key: string]: string }[]>();
+      this._next = new Subject<void>();
+      this._next.subscribe(() => subject.next(records));
+      return subject;
+    } else {
+      return new BehaviorSubject<{ [key: string]: string }[]>(records);
+    }
+  }
+
+  next() {
+    this._next.next();
   }
 
 }
