@@ -20,9 +20,12 @@ mat-paginator {
 
 .mst-table-container {
   max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
   position: relative;
+
+  .mst-table-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
 
   .mst-loading-overlay {
     display: flex;  // mat-spinnerを上下中央に配置する
