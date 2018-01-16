@@ -490,7 +490,6 @@ class TestDataProvider implements SelectableTableDataProvider {
       records.push(data);
     }
     if (this.delay) {
-      console.log('delaying getRecords');
       const subject = new Subject<{ [key: string]: string }[]>();
       this._next = new Subject<void>();
       this._next.subscribe(() => subject.next(records));
