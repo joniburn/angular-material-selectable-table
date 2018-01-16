@@ -122,7 +122,10 @@ export class SelectableTableComponent implements OnChanges {
         };
         this.onPageEvent(pageEvent);
       });
-      this.dataSource.dataChange.subscribe(() => this.loading = false);
+      this.dataSource.dataChange.subscribe(() => {
+        this.loading = false;
+        this.selection.clear();
+      });
     }
     if (changes['headers'] && this.headers) {
       this.headerKeys = Object.keys(this.headers);
@@ -139,7 +142,6 @@ export class SelectableTableComponent implements OnChanges {
       this.pageSize = pageEvent.pageSize;
       this.dataSource.setPage(this.pageIndex, this.pageSize);
     }
-    this.selection.clear();
     this.loading = true;
   }
 
