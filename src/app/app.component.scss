@@ -1,0 +1,56 @@
+@import '../theme.scss';
+@import './selectable-table/_selectable-table-theme.scss';
+
+@mixin themed-table-light($theme) {
+  mst-selectable-table {
+    @include selectable-table-theme-light($theme);
+  }
+}
+
+@mixin themed-table-dark($theme) {
+  mst-selectable-table {
+    @include selectable-table-theme-dark($theme);
+  }
+}
+
+.theme-selectors {
+  margin: 20px;
+}
+
+.table-sample {
+  width: 600px;
+  mat-card {
+    padding: 8px;
+  }
+
+  &.light-theme {
+    &.light-table {
+      @include themed-table-light($light-theme);
+    }
+    &.dark-table {
+      @include themed-table-dark($light-theme);
+    }
+  }
+
+  &.dark-theme {
+    &.light-table {
+      @include themed-table-light($dark-theme);
+    }
+    &.dark-table {
+      @include themed-table-dark($dark-theme);
+    }
+  }
+}
+
+.checkbox-preview:not(:last-child) {
+  margin-bottom: 20px;
+}
+
+.checkbox-preview {
+  display: flex;
+  flex-direction: row;
+
+  .checkbox-state {
+    margin-left: 20px;
+  }
+}
